@@ -1,0 +1,53 @@
+# 自动部署到 GitHub Pages
+# 触发时机：向 master 分支推送代码时自动运行
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master, main]
+  # 也支持在 GitHub 网页上手动点按钮触发
+  workflow_dispatch:
+
+# 部署 Pages 所需的最小权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同时只允许一个部署任务，新的会取消旧的，避免互相覆盖
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 只把线上真正需要的文件放进 dist，
+      # 避免把 test/、deploy/、.github/ 这些也发布出去
+      - name: 整理发布文件
+        run: |
+          mkdir -p dist
+          cp index.html admin.html dist/
+          cp -r assets data dist/
+          echo "已整理的文件："
+          find dist -type f | head -40
+
+      - name: 打包为 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
