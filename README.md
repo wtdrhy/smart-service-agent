@@ -5,8 +5,8 @@
 
 | | 地址 | 说明 |
 |---|---|---|
-| 客服对话端 | https://6060e0dab2c14d1fb09d2bafec178379.app.workbuddy.host | 直接对话体验 |
-| 管理后台 | 同上 `/admin.html` | 访问口令 `admin2026` |
+| 客服对话端 | https://wtdrhy.github.io/smart-service-agent/ | 直接对话体验 |
+| 管理后台 | https://wtdrhy.github.io/smart-service-agent/admin.html | 访问口令 `admin2026` |
 
 > 后台首次打开是空的，点右上角 **「生成演示数据」** 可一键造 30 个会话 / 7 天历史，看板立刻有数据。
 
