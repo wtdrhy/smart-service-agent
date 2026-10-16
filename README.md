@@ -192,8 +192,3 @@ node test/browser-smoke.js    # jsdom 浏览器级冒烟（需先起 serve-local
 | 检索为词法匹配 | 未用向量，同义词召回有上限 | 引入 embedding 做向量召回，与 BM25 混合 |
 
 ---
-
-## 八、简历版总结
-
-见 **[RESUME.md](./RESUME.md)**，包含可直接粘贴的项目描述、技术要点、
-量化指标，以及 12 个面试高频追问的回答要点。
