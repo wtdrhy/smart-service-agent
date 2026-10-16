@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>智能客服 Agent · 在线客服</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+</head>
+<body>
+
+<div class="chat-shell">
+  <!-- 头部 -->
+  <div class="chat-head">
+    <div class="avatar">知</div>
+    <div>
+      <h1>智能客服 <span id="botName">小知</span></h1>
+      <div class="sub">
+        <span class="dot" id="llmDot"></span>
+        <span id="modeText">演示模式</span>
+        <span class="muted">·</span>
+        <span id="dbText" class="muted">本地存储</span>
+      </div>
+    </div>
+    <div class="head-actions">
+      <button class="btn" id="btnDebug">调试面板</button>
+      <button class="btn" id="btnSetting">设置</button>
+      <button class="btn ghost" id="btnAdmin" title="管理后台">后台</button>
+      <button class="btn ghost" id="btnNew" title="开启新会话">新会话</button>
+    </div>
+  </div>
+
+  <!-- 消息区 -->
+  <div class="chat-body" id="chatBody"></div>
+
+  <!-- 快捷问题 -->
+  <div class="quick-row" id="quickRow"></div>
+
+  <!-- 满意度 -->
+  <div id="surveyArea"></div>
+
+  <!-- 输入区 -->
+  <div class="chat-input">
+    <div class="input-box">
+      <textarea id="input" rows="1" placeholder="描述你的问题，例如：我的订单还没发货 / 我想退款 / 登录一直闪退"></textarea>
+      <button class="btn primary" id="btnSend">发送</button>
+    </div>
+    <div class="hint">Enter 发送 · Shift+Enter 换行 · 直接说「转人工」可接入真人客服</div>
+  </div>
+</div>
+
+<!-- 设置面板 -->
+<div class="modal-mask" id="settingModal" style="display:none">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>运行配置</h2>
+      <button class="btn ghost" id="btnCloseSetting">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="status-line" id="llmStatus">检测中…</div>
+      <div class="status-line" id="dbStatus">检测中…</div>
+
+      <div class="section-title">大模型（DeepSeek）</div>
+      <div class="field">
+        <label>API Key <span class="desc">留空则自动使用内置规则引擎，全流程仍可运行</span></label>
+        <input type="password" id="cfgApiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>反代地址 <span class="desc">DeepSeek 官方端点无 CORS 头，浏览器直连需自建反代（见 deploy/worker-proxy.js）</span></label>
+        <input type="text" id="cfgProxy" placeholder="https://your-proxy.workers.dev/v1">
+      </div>
+      <div class="field">
+        <label>模型</label>
+        <select id="cfgModel">
+          <option value="deepseek-chat">deepseek-chat（通用对话）</option>
+          <option value="deepseek-reasoner">deepseek-reasoner（推理增强）</option>
+        </select>
+      </div>
+      <div class="row">
+        <label style="font-size:12.5px"><input type="checkbox" id="cfgUseLlmIntent" checked> 启用 LLM 意图分类</label>
+        <label style="font-size:12.5px"><input type="checkbox" id="cfgUseLlmAnswer" checked> 启用 LLM 回答生成</label>
+      </div>
+
+      <div class="section-title">云数据库（Supabase）</div>
+      <div class="field">
+        <label>Project URL</label>
+        <input type="text" id="cfgDbUrl" placeholder="https://xxxxxxxx.supabase.co">
+      </div>
+      <div class="field">
+        <label>anon public key</label>
+        <input type="password" id="cfgDbKey" placeholder="eyJhbGciOi..." autocomplete="off">
+      </div>
+
+      <div class="section-title">Agent 策略</div>
+      <div class="row">
+        <div class="field" style="flex:1;min-width:140px">
+          <label>置信度阈值</label>
+          <input type="number" id="cfgThreshold" step="0.05" min="0" max="1">
+        </div>
+        <div class="field" style="flex:1;min-width:140px">
+          <label>连续未理解轮次</label>
+          <input type="number" id="cfgMaxLow" step="1" min="1" max="10">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="btnResetCfg">恢复默认</button>
+      <button class="btn" id="btnTestCfg">测试连通性</button>
+      <button class="btn primary" id="btnSaveCfg">保存并应用</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/llm.js"></script>
+<script src="data/faq.data.js"></script>
+<script src="assets/js/faq.js"></script>
+<script src="assets/js/intent.js"></script>
+<script src="assets/js/agent.js"></script>
+<script src="assets/js/chat.js"></script>
+</body>
+</html>

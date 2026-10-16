@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能客服 Agent · 管理后台</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+
+<!-- 登录 -->
+<div id="loginView" class="login-shell">
+  <div class="login-card">
+    <div class="avatar" style="margin:0 auto 14px">知</div>
+    <h2>智能客服管理后台</h2>
+    <p>请输入访问口令以查看对话记录与统计</p>
+    <input type="password" id="passInput" placeholder="访问口令" autocomplete="off">
+    <div class="err" id="loginErr"></div>
+    <button class="btn primary" id="btnLogin" style="width:100%">进入后台</button>
+    <div class="muted" style="margin-top:14px;font-size:11.5px">默认口令：admin2026（可在 chat 端设置中修改）</div>
+  </div>
+</div>
+
+<!-- 主体 -->
+<div id="adminView" style="display:none" class="admin-shell">
+  <aside class="sidebar">
+    <div class="brand-box">
+      <div class="avatar" style="width:32px;height:32px;border-radius:10px;font-size:13px">知</div>
+      <div>
+        <div class="name">客服 Agent</div>
+        <div class="tag">管理后台</div>
+      </div>
+    </div>
+    <div class="nav-item active" data-tab="overview">📈 数据概览</div>
+    <div class="nav-item" data-tab="sessions">💬 对话记录</div>
+    <div class="nav-item" data-tab="tickets">🎫 人工工单</div>
+    <div class="nav-item" data-tab="feedback">⭐ 满意度</div>
+    <div class="nav-item" data-tab="knowledge">📚 知识库</div>
+    <div class="nav-item" data-tab="settings">⚙️ 数据源</div>
+    <div class="side-foot">
+      <div id="sideMode">存储：—</div>
+      <div style="margin-top:6px"><a href="index.html" style="color:var(--brand);text-decoration:none">← 返回对话端</a></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <h1 id="pageTitle">数据概览</h1>
+      <span class="meta" id="pageMeta"></span>
+      <span class="spacer"></span>
+      <button class="btn" id="btnSeed" title="生成一批模拟历史数据，用于演示统计图表">生成演示数据</button>
+      <button class="btn" id="btnRefresh">刷新</button>
+    </div>
+
+    <!-- 概览 -->
+    <section id="tab-overview">
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><h3>用户意图分布</h3><span class="spacer"></span><span class="muted" id="intentTotal"></span></div>
+          <div class="panel-body"><div class="chart-box"><canvas id="chartIntent"></canvas></div><div class="legend" id="legendIntent"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>满意度分布</h3><span class="spacer"></span><span class="muted" id="csatMeta"></span></div>
+          <div class="panel-body"><div class="chart-box"><canvas id="chartCsat"></canvas></div></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><h3>近 7 日会话趋势</h3></div>
+          <div class="panel-body"><div class="chart-box"><canvas id="chartTrend"></canvas></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>回答来源构成</h3><span class="spacer"></span><span class="muted">自动化能力占比</span></div>
+          <div class="panel-body"><div id="sourceBars"></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>未解决问题 Top（触发兜底的话术）</h3></div>
+        <div class="panel-body" id="unsolvedList"></div>
+      </div>
+    </section>
+
+    <!-- 对话记录 -->
+    <section id="tab-sessions" style="display:none">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>会话列表</h3>
+          <span class="spacer"></span>
+          <select id="sessionFilter" style="padding:5px 9px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--text)">
+            <option value="all">全部会话</option>
+            <option value="transferred">仅已转人工</option>
+            <option value="open">仅进行中</option>
+          </select>
+        </div>
+        <div class="replay-wrap">
+          <div class="replay-list" id="sessionList"></div>
+          <div class="replay-detail" id="sessionDetail">
+            <div class="empty">从左侧选择一个会话查看完整对话</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 工单 -->
+    <section id="tab-tickets" style="display:none">
+      <div class="panel">
+        <div class="panel-head"><h3>人工工单</h3><span class="spacer"></span><span class="muted" id="ticketMeta"></span></div>
+        <div class="panel-body" style="padding:0"><div id="ticketList"></div></div>
+      </div>
+    </section>
+
+    <!-- 满意度 -->
+    <section id="tab-feedback" style="display:none">
+      <div class="panel">
+        <div class="panel-head"><h3>满意度评价明细</h3><span class="spacer"></span><span class="muted" id="fbMeta"></span></div>
+        <div class="panel-body" style="padding:0"><div id="fbList"></div></div>
+      </div>
+    </section>
+
+    <!-- 知识库 -->
+    <section id="tab-knowledge" style="display:none">
+      <div class="panel">
+        <div class="panel-head"><h3>FAQ 知识库</h3><span class="spacer"></span><span class="muted" id="kbMeta"></span></div>
+        <div class="panel-body" style="padding:0"><div id="kbList"></div></div>
+      </div>
+    </section>
+
+    <!-- 数据源 -->
+    <section id="tab-settings" style="display:none">
+      <div class="panel">
+        <div class="panel-head"><h3>数据源与模型状态</h3></div>
+        <div class="panel-body" id="settingsBody"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>系统架构</h3></div>
+        <div class="panel-body">
+          <pre class="mono" style="margin:0;white-space:pre-wrap;line-height:1.9">用户提问
+  ↓
+① 意图识别（三层融合）
+   规则快通道 → FAQ 检索信号 → 大模型分类 → 加权投票 + 上下文修正
+  ↓
+② 槽位填充（Slot Filling）
+   缺失必要信息则追问，超过重试上限转人工
+  ↓
+③ 回答生成（RAG）
+   BM25 检索 → 提示词拼装 → DeepSeek 生成；无 Key 时回落知识库原文
+  ↓
+④ 兜底与转人工
+   低置信 / 负面情绪 / 投诉 / 连续未理解 → 生成工单
+  ↓
+⑤ 全链路落库
+   messages 表记录意图、置信度、来源、耗时 → 后台统计分析</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/llm.js"></script>
+<script src="data/faq.data.js"></script>
+<script src="assets/js/faq.js"></script>
+<script src="assets/js/intent.js"></script>
+<script src="assets/js/agent.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
